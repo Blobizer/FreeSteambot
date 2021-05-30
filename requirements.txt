@@ -1,0 +1,7 @@
+beautifulsoup4
+requests 
+os
+sqlite3
+config
+aiogram
+asyncio
