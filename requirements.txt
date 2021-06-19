@@ -1,7 +1,3 @@
-beautifulsoup4
-requests 
-os
-sqlite3
-config
-aiogram
-asyncio
+aiogram==2.11.2
+requests==2.25.1
+beautifulsoup4==4.9.3
