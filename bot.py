@@ -1,5 +1,7 @@
 import logging
-from config import token
+
+from aiogram.types import reply_keyboard
+from config import *
 from sqlite import SQLighter
 from buttons import *
 from states import *
@@ -31,8 +33,8 @@ async def subscribe(message: types.Message):
 
 
 
-@dp.message_handler(state="*", text_endswith=['Отписаться', 'отписаться'])
-async def stop_command(message: types.Message, state: FSMContext):
+@dp.message_handler(text_endswith = "Отписаться" )
+async def stop_command(message: types.Message):
     if(not db.subscriber_exists(message.from_user.id)):
         
         db.add_subscriber(message.from_user.id, False)
@@ -44,9 +46,8 @@ async def stop_command(message: types.Message, state: FSMContext):
 
         await message.answer(text="Вы отписались от рассылки", reply_markup=sub)
 
-    await state.finish()
 
-@dp.message_handler(Text(equals="Подписаться"))
+@dp.message_handler(text_endswith = "Подписаться")
 async def subscribes(message: types.Message):
     if(not db.subscriber_exists(message.from_user.id)):
 
@@ -78,11 +79,35 @@ async def scheduled(wait_for):
         else:
             logging.info("sleep")
 
+@dp.message_handler(text_contains='Отмена')
+async def admin_panel(message: types.Message):
+    await message.answer("Меню.", reply_markup=main_menu)
 
 
+# Admin panel 
+
+@dp.message_handler(user_id = admin_id, commands=['admin'] )
+async def admin_panel(message: types.Message):
+    await message.answer("Меню", reply_markup=main_menu)    
     
 
+@dp.message_handler(user_id = admin_id , state="*", text_endswith='Начать рассылку юзерам.')
+async def mailling(message: types.Message):
+    await message.answer("Введите сообщение", reply_markup=cancel)
+    await Press.maill.set()
+
+
+@dp.message_handler(state=Press.maill)
+async def process_name(message: types.Message, state: FSMContext):
+    subscribes = db.get_subscriptions()
+
+    for i in subscribes:
+        await bot.send_message(i[1], message.text)
+
+    await message.answer("Рассылка закончена.", reply_markup=main_menu)
+    await state.finish()
+ 
 if __name__ == "__main__":  
     loop = asyncio.get_event_loop()
-    loop.create_task(scheduled(10)) # цифра 10 обозначает время отдыха
+    loop.create_task(scheduled(5)) # цифра 10 обозначает время отдыха
     executor.start_polling(dp, skip_updates=True)

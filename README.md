@@ -3,16 +3,29 @@
 ![image](https://user-images.githubusercontent.com/53018156/120108904-d2607700-c16f-11eb-9d9b-724d6dbdf5db.png)
 
 
-# Инструкция по настройке
-1. Установить все принадлежности(requirements.txt)
+# Инструкция по настройке:
+```
 
-2. Получить токен бота и вставить в переменную token в файле config.py
+pip install -r requirements.txt
 
-3. Запустить bot.py.
-
-
+```
 
 
+# Настройка config.py:
+
+```python
+
+token = "" # Токен бота
+admin_id =   # id для доступа к админ панели 
+
+```
+
+# Запуск бота:
+```
+
+python main.py
+
+```
 
 # Связь со мной
    telegram: @blobizer
