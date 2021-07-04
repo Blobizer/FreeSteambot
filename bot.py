@@ -1,3 +1,13 @@
+# --------------------------------------
+# Program by Blobizer
+#
+#
+# Version       Date        Info
+# 1.1.0         2021   Main project file
+#
+# --------------------------------------
+
+
 import logging
 
 from aiogram.types import reply_keyboard
@@ -105,8 +115,15 @@ async def process_name(message: types.Message, state: FSMContext):
         await bot.send_message(i[1], message.text)
 
     await message.answer("Рассылка закончена.", reply_markup=main_menu)
+
     await state.finish()
  
+@dp.message_handler(text_contains='Статистика')
+async def stats(message: types.Message):
+    subscribes = db.get_subscriptions()
+
+    await message.answer(f"Всего подписчиков: {len(subscribes)}")
+
 if __name__ == "__main__":  
     loop = asyncio.get_event_loop()
     loop.create_task(scheduled(5)) # цифра 10 обозначает время отдыха

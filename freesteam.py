@@ -1,3 +1,13 @@
+# --------------------------------------
+# Program by Blobizer
+#
+#
+# Version       Date        Info
+# 1.1.0         2021   Parser file
+#
+# --------------------------------------
+
+
 from bs4 import BeautifulSoup
 import requests 
 import os
