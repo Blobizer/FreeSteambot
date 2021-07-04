@@ -27,7 +27,7 @@ admin_id =   # id для доступа к админ панели
 # Запуск бота:
 ```
 
-python main.py
+python bot.py
 
 ```
 
