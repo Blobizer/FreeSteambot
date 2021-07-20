@@ -1,33 +1,87 @@
-import sqlite3
+import psycopg2
+from psycopg2 import Error
 
-class SQLighter:
 
-    def __init__(self, database):
-        """Подключаемся к БД и сохраняем курсор соединения"""
-        self.connection = sqlite3.connect(database)
-        self.cursor = self.connection.cursor()
 
-    def get_subscriptions(self, status = True):
-        """Получаем всех активных подписчиков бота"""
-        with self.connection:
-            return self.cursor.execute("SELECT * FROM `subscriptions` WHERE `status` = ?", (status,)).fetchall()
+def conn():
+    try:
+        connection = psycopg2.connect(user="postgres",
+                                      # пароль, который указали при установке PostgreSQL
+                                      password=" ",
+                                      host="127.0.0.1",
+                                      port="5432",
+                                      database="postgres")
 
-    def subscriber_exists(self, user_id):
-        """Проверяем, есть ли уже юзер в базе"""
-        with self.connection:
-            result = self.cursor.execute('SELECT * FROM `subscriptions` WHERE `user_id` = ?', (user_id,)).fetchall()
-            return bool(len(result))
+        cursor = connection.cursor()
 
-    def add_subscriber(self, user_id, status = True):
-        """Добавляем нового подписчика"""
-        with self.connection:
-            return self.cursor.execute("INSERT INTO `subscriptions` (`user_id`, `status`) VALUES(?,?)", (user_id,status))
+        
 
-    def update_subscription(self, user_id, status):
-        """Обновляем статус подписки пользователя"""
-        with self.connection:
-            return self.cursor.execute("UPDATE `subscriptions` SET `status` = ? WHERE `user_id` = ?", (status, user_id))
+        
+        return cursor, connection
 
-    def close(self):
-        """Закрываем соединение с БД"""
-        self.connection.close()
+    except (Exception, Error) as error:
+        print("Ошибка при работе с PostgreSQL", error)
+
+def create_table():
+    cursor, connection = conn()
+    # SQL-запрос для создания новой таблицы
+    create_table_query = '''CREATE TABLE FreeSteamBot
+                          (USER_ID           INT    NOT NULL,
+                          STATUS         BOOL); '''
+    # Выполнение команды: это создает новую таблицу
+    cursor.execute(create_table_query)
+    connection.commit()
+
+
+def get_subs():
+    cursor, connection = conn()
+
+    cursor.execute("select USER_ID from FreeSteamBot where status = True ")
+
+    a = cursor.fetchall()
+    
+    
+    cursor.close()
+    connection.close()
+
+    return a
+
+
+def add_sub(user_id):
+    cursor, connection = conn()
+
+    cursor.execute(f""" INSERT INTO FreeSteamBot (USER_ID, STATUS) VALUES ({user_id}, {True})""")
+
+    connection.commit()
+
+    cursor.close()
+    connection.close()
+
+
+def edit_sub(user_id, status):
+    cursor, connection = conn()
+
+    cursor.execute(f"""Update FreeSteamBot set STATUS = {status} where user_id = {user_id}""")
+
+    connection.commit()
+
+    cursor.close()
+    connection.close()
+
+def subs_exist(user_id):
+    cursor, connection = conn()
+
+    cursor.execute(f"select * from FreeSteamBot where USER_ID = {user_id} ")
+
+    a = cursor.fetchall()
+
+    cursor.close()
+    connection.close()
+
+    return a 
+
+
+a = get_subs()
+
+for i in a:
+    print(i[0])
