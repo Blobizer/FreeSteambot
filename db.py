@@ -7,7 +7,7 @@ def conn():
     try:
         connection = psycopg2.connect(user="postgres",
                                       # пароль, который указали при установке PostgreSQL
-                                      password=" ",
+                                      password="654732",
                                       host="127.0.0.1",
                                       port="5432",
                                       database="postgres")
@@ -81,7 +81,3 @@ def subs_exist(user_id):
     return a 
 
 
-a = get_subs()
-
-for i in a:
-    print(i[0])
